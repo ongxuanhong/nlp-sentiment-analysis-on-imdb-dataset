@@ -3,7 +3,7 @@ import joblib
 
 # Load pre-trained TF-IDF vectorizer and RandomForest classifier
 tfidf = joblib.load("models/tfidf_vectorizer.pkl")
-rf_model = joblib.load("models/randomforest_model.pkl")
+rf_model = joblib.load("models/randomforest_model.pkl.bz2")
 
 # Title of the app
 st.title("Sentiment Analysis App")
