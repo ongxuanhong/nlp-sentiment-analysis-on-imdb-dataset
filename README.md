@@ -69,3 +69,142 @@ Text preprocessing is an essential step in Natural Language Processing (NLP) to 
 ### 17. **Handling Slang and Abbreviations**
    - Expand slang or abbreviations for uniformity.
    - Example: "OMG" → "Oh my God", "BTW" → "By the way"
+
+## Encoding techniques
+
+### 1. **Label Encoding**
+Label Encoding is used to convert categorical data into numerical labels. Each unique category is assigned an integer value.
+
+#### Example:
+If we have a categorical feature with values: `['red', 'green', 'blue']`, Label Encoding would map each label to an integer:
+- 'red' → 0
+- 'green' → 1
+- 'blue' → 2
+
+```python
+from sklearn.preprocessing import LabelEncoder
+
+# Example data
+colors = ['red', 'green', 'blue', 'green', 'blue', 'red']
+
+# Create LabelEncoder object
+le = LabelEncoder()
+
+# Apply LabelEncoder
+encoded_labels = le.fit_transform(colors)
+print(encoded_labels)  # Output: [2 1 0 1 0 2]
+```
+
+**Note:** Label encoding assumes a natural order between categories, so it's best used when there is such an order.
+
+### 2. **One-Hot Encoding**
+One-Hot Encoding converts categorical variables into a binary matrix. Each category is represented by a binary vector where only the index corresponding to the category is 1, and all others are 0.
+
+#### Example:
+For the categorical feature `['red', 'green', 'blue']`, One-Hot Encoding will produce the following:
+- 'red' → [1, 0, 0]
+- 'green' → [0, 1, 0]
+- 'blue' → [0, 0, 1]
+
+```python
+from sklearn.preprocessing import OneHotEncoder
+import numpy as np
+
+# Example data
+colors = np.array(['red', 'green', 'blue', 'green', 'blue', 'red']).reshape(-1, 1)
+
+# Create OneHotEncoder object
+ohe = OneHotEncoder(sparse_output=False)
+
+# Apply OneHotEncoder
+one_hot_encoded = ohe.fit_transform(colors)
+print(one_hot_encoded)
+# Output: [[1. 0. 0.]
+#          [0. 1. 0.]
+#          [0. 0. 1.]
+#          [0. 1. 0.]
+#          [0. 0. 1.]
+#          [1. 0. 0.]]
+```
+
+### 3. **Bag of Words (BoW) Encoding**
+Bag of Words is a method to represent text data by counting the occurrences of words in a document or text. It disregards the word order and focuses only on word frequency.
+
+#### Example:
+Consider two sentences:
+1. "I love machine learning."
+2. "Machine learning is awesome."
+
+The Bag of Words matrix would look like this:
+
+|          | I | love | machine | learning | is | awesome |
+|----------|---|------|---------|----------|----|---------|
+| Sentence 1 | 1 | 1    | 1       | 1        | 0  | 0       |
+| Sentence 2 | 0 | 0    | 1       | 1        | 1  | 1       |
+
+```python
+from sklearn.feature_extraction.text import CountVectorizer
+
+# Example data
+documents = ["I love machine learning", "Machine learning is awesome"]
+
+# Create CountVectorizer object
+vectorizer = CountVectorizer()
+
+# Apply Bag of Words
+bow_matrix = vectorizer.fit_transform(documents).toarray()
+
+# Show BoW matrix
+print(bow_matrix)
+print(vectorizer.get_feature_names_out())
+# Output:
+# [[1 1 0 1 1 0]
+#  [0 0 1 1 1 1]]
+# ['awesome' 'is' 'love' 'machine' 'learning' 'i']
+```
+
+### 4. **TF-IDF (Term Frequency-Inverse Document Frequency)**
+TF-IDF is a more advanced technique that weighs the importance of a word in a document relative to its frequency in a corpus. It combines two metrics:
+- **Term Frequency (TF)**: Measures how frequently a word appears in a document.
+- **Inverse Document Frequency (IDF)**: Measures how important a word is by considering its rarity across all documents.
+
+A higher TF-IDF score means a word is frequent in a specific document but rare across the entire dataset.
+
+#### Example:
+For the same two sentences:
+1. "I love machine learning."
+2. "Machine learning is awesome."
+
+TF-IDF might assign higher weights to rare words like "awesome" and lower weights to common words like "machine" or "learning".
+
+```python
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+# Example data
+documents = ["I love machine learning", "Machine learning is awesome"]
+
+# Create TfidfVectorizer object
+tfidf_vectorizer = TfidfVectorizer()
+
+# Apply TF-IDF
+tfidf_matrix = tfidf_vectorizer.fit_transform(documents).toarray()
+
+# Show TF-IDF matrix
+print(tfidf_matrix)
+print(tfidf_vectorizer.get_feature_names_out())
+# Output:
+# [[0.        0.        0.70710678 0.70710678 0.        0.        ]
+#  [0.4472136 0.4472136 0.         0.         0.4472136 0.4472136]]
+# ['awesome' 'is' 'love' 'machine' 'learning' 'i']
+```
+
+In this example, words that appear across both documents (like "machine" and "learning") are weighted lower, while unique words like "awesome" and "love" are weighted higher.
+
+### **Comparative Analysis**
+
+| Technique      | Advantages                                                        | Disadvantages                                                     | Ideal Use Cases                                                 |
+|----------------|--------------------------------------------------------------------|-------------------------------------------------------------------|----------------------------------------------------------------|
+| **Label Encoding** | Simple, memory efficient, suitable for ordinal features         | Assumes an order between categories, may introduce bias            | Ordinal categorical features (e.g., rankings)                  |
+| **One-Hot Encoding** | No order assumption, interprets categories as independent      | High dimensionality, inefficient for large categorical variables   | Nominal categorical variables with manageable categories        |
+| **Bag of Words (BoW)** | Simple, interprets text by frequency                        | Ignores word order and context, produces large sparse matrices     | Small- to medium-sized datasets for text classification         |
+| **TF-IDF**         | Weighs important words, reduces common word over-representation | Still ignores word order, computationally expensive for large corpora | Information retrieval, document classification, text similarity |
